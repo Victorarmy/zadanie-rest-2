@@ -42,23 +42,42 @@ public class MovieRestController {
         }
 
         Movie savedMovie = movieRepository.save(newMovie);
-        URI uri= getURIForSavedMovie(savedMovie);
+        URI uri = getURIForSavedMovie(savedMovie);
         return ResponseEntity
                 .created(uri)
                 .build();
     }
 
     @PutMapping("/movies/{id}")
-    public ResponseEntity changeFilm(@PathVariable long id) {
+    public ResponseEntity changeFilm(@PathVariable long id, @RequestBody Movie changedMovie) {
         Movie foundMovie = movieRepository.findOne(id);
         if (foundMovie == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .notFound()
+                    .build();
         }
-
-
+        changedMovie.setId(foundMovie.getId());
+        movieRepository.save(changedMovie);
+        return ResponseEntity
+                .ok()
+                .build();
     }
 
-    private boolean isExistingTheSameMovieInDatabase(@RequestBody Movie newMovie) {
+    @DeleteMapping("/movies/{id}")
+    public ResponseEntity deleteMovie(@PathVariable long id) {
+        Movie foundMovie = movieRepository.findOne(id);
+        if (foundMovie == null) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+        movieRepository.delete(id);
+        return ResponseEntity
+                .ok()
+                .build();
+    }
+
+    private boolean isExistingTheSameMovieInDatabase(Movie newMovie) {
         Movie movieFoundByTheSameTitle = movieRepository.findByTitle(newMovie.getTitle());
         if (movieFoundByTheSameTitle != null) {
             return movieFoundByTheSameTitle.equals(newMovie);
@@ -70,6 +89,7 @@ public class MovieRestController {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(savedMovie.getId()).toUri();
+                .buildAndExpand(savedMovie.getId())
+                .toUri();
     }
 }

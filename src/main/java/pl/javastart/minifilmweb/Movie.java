@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 public class Movie {
@@ -51,5 +52,19 @@ public class Movie {
 
     public void setActors(String actors) {
         this.actors = actors;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return Objects.equals(title, movie.title);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(title);
     }
 }
